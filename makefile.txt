@@ -1,0 +1,56 @@
+# Makefile for BRCA Cancer Prediction System
+
+.PHONY: install run test clean docker-build docker-run help
+
+# Default target
+help:
+	@echo "Available commands:"
+	@echo "  install     - Install dependencies"
+	@echo "  run         - Run the Streamlit app locally"
+	@echo "  test        - Run tests"
+	@echo "  clean       - Clean up temporary files"
+	@echo "  docker-build - Build Docker image"
+	@echo "  docker-run  - Run Docker container"
+	@echo "  requirements - Generate requirements.txt"
+
+# Install dependencies
+install:
+	pip install --upgrade pip
+	pip install -r requirements.txt
+
+# Run the application locally
+run:
+	streamlit run streamlit_app.py
+
+# Run tests
+test:
+	python -c "import streamlit; import pandas; import sklearn; import xgboost; print('✅ All imports successful')"
+	python -m py_compile streamlit_app.py
+	@echo "✅ Streamlit app syntax check passed"
+
+# Clean temporary files
+clean:
+	find . -type f -name "*.pyc" -delete
+	find . -type d -name "__pycache__" -delete
+	find . -type d -name ".pytest_cache" -delete
+	rm -rf .streamlit/secrets.toml
+
+# Docker commands
+docker-build:
+	docker build -t brca-prediction .
+
+docker-run:
+	docker run -p 8501:8501 brca-prediction
+
+# Generate requirements.txt from current environment
+requirements:
+	pip freeze > requirements.txt
+	@echo "✅ requirements.txt updated"
+
+# Setup development environment
+dev-setup: install
+	@echo "✅ Development environment ready"
+	@echo "Run 'make run' to start the application"
+
+# Quick start
+start: install run
